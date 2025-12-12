@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔羅抽牌 - Tarot Card Reading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #4a5568;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2d3748;
+        }
+
+        .btn-reset {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-reset:hover {
+            background: #cbd5e0;
+        }
+
+        #results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        #results.show {
+            display: block;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .summary h2 {
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .cards-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .card-result {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+
+        .card-result:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card-position {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .card-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .card-orientation {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .orientation-upright {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .orientation-reversed {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .card-description {
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        .disclaimer {
+            margin-top: 30px;
+            padding: 15px;
+            background: #fff5f5;
+            border-left: 4px solid #fc8181;
+            border-radius: 5px;
+            font-size: 0.85em;
+            color: #742a2a;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 塔羅抽牌</h1>
+        <p class="subtitle">自我反思與探索的工具</p>
+
+        <div class="form-group">
+            <label for="spread">牌陣選擇</label>
+            <select id="spread">
+                <option value="1">一張牌（今日建議）</option>
+                <option value="3">三張牌（過去/現在/未來）</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="qtype">問題類型（可選）</label>
+            <select id="qtype">
+                <option value="">請選擇...</option>
+                <option value="self">自我探索</option>
+                <option value="love">感情關係</option>
+                <option value="work">工作事業</option>
+                <option value="study">學業成長</option>
+                <option value="finance">財務狀況</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="question">您的問題（可留白）</label>
+            <textarea id="question" placeholder="請輸入您想探索的問題..."></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+            <input type="checkbox" id="allowReversed" checked>
+            <label for="allowReversed">包含逆位牌</label>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" id="btnDraw">🎴 抽牌</button>
+            <button class="btn-secondary" id="btnRedraw">🔄 重抽</button>
+            <button class="btn-reset" id="btnReset">↺ 重置</button>
+        </div>
+
+        <div id="results">
+            <div class="summary">
+                <h2>✨ 整體解讀</h2>
+                <p id="summaryText"></p>
+            </div>
+            <div class="cards-container" id="cardsContainer"></div>
+        </div>
+
+        <div class="disclaimer">
+            <strong>⚠️ 免責聲明：</strong>本工具僅供自我反思參考，不保證預測結果。涉及重大決策（醫療、法律、投資等）請諮詢專業人士。
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 塔羅牌資料庫
+        // ============================================
+        const CARD_DB = [
+            // 大阿爾克那 (Major Arcana)
+            {
+                id: "major_00",
+                name: "愚者 (The Fool)",
+                arcana: "major",
+                suite: null,
+                upright: "新的開始、冒險精神、自由無拘、保持開放的心態。代表踏上新旅程的勇氣。",
+                reversed: "魯莽衝動、缺乏計畫、逃避責任。提醒需要更謹慎地評估風險。"
+            },
+            {
+                id: "major_01",
+                name: "魔術師 (The Magician)",
+                arcana: "major",
+                suite: null,
+                upright: "創造力、技能展現、行動力、資源整合。擁有實現目標的所有工具。",
+                reversed: "操控欺騙、濫用技能、缺乏方向。可能在浪費天賦或誤用能力。"
+            },
+            {
+                id: "major_02",
+                name: "女祭司 (The High Priestess)",
+                arcana: "major",
+                suite: null,
+                upright: "直覺智慧、內在知識、神秘洞察。傾聽內心的聲音，相信直覺。",
+                reversed: "忽視直覺、秘密隱藏、內在失衡。可能被表象迷惑而忽略真相。"
+            },
+            {
+                id: "major_03",
+                name: "皇后 (The Empress)",
+                arcana: "major",
+                suite: null,
+                upright: "豐盛滋養、創造力、母性關懷、自然美好。代表成長與繁榮的時期。",
+                reversed: "依賴他人、創意受阻、過度保護。可能在物質或情感上感到匱乏。"
+            },
+            {
+                id: "major_04",
+                name: "皇帝 (The Emperor)",
+                arcana: "major",
+                suite: null,
+                upright: "權威領導、結構秩序、穩定基礎、父性力量。建立明確的規則與界限。",
+                reversed: "控制過度、僵化固執、濫用權力。可能在權威議題上遇到挑戰。"
+            },
+            {
+                id: "major_05",
+                name: "教皇 (The Hierophant)",
+                arcana: "major",
+                suite: null,
+                upright: "傳統智慧、精神指導、教育學習、遵循常規。尋求傳統價值的指引。",
+                reversed: "打破傳統、反叛質疑、獨立思考。可能需要走出慣例尋找新路。"
+            },
+            {
+                id: "major_06",
+                name: "戀人 (The Lovers)",
+                arcana: "major",
+                suite: null,
+                upright: "愛情結合、重要選擇、和諧關係、價值觀一致。面臨心靈層面的抉擇。",
+                reversed: "關係失衡、價值衝突、錯誤選擇。在關係或選擇中感到困惑。"
+            },
+            {
+                id: "major_07",
+                name: "戰車 (The Chariot)",
+                arcana: "major",
+                suite: null,
+                upright: "意志力、前進動力、克服障礙、自律控制。透過決心達成目標。",
+                reversed: "失去控制、方向迷失、內在衝突。可能需要重新整合內在力量。"
+            },
+            {
+                id: "major_08",
+                name: "力量 (Strength)",
+                arcana: "major",
+                suite: null,
+                upright: "內在力量、溫柔勇氣、耐心包容、自信優雅。以柔克剛的智慧。",
+                reversed: "自我懷疑、缺乏勇氣、壓抑情緒。可能在自信心上遇到挑戰。"
+            },
+            {
+                id: "major_09",
+                name: "隱者 (The Hermit)",
+                arcana: "major",
+                suite: null,
+                upright: "內省沉思、尋求真理、獨處智慧、精神指引。需要安靜反思的時刻。",
+                reversed: "孤立封閉、逃避現實、過度內向。可能在孤獨與連結之間失衡。"
+            },
+            {
+                id: "major_10",
+                name: "命運之輪 (Wheel of Fortune)",
+                arcana: "major",
+                suite: null,
+                upright: "命運轉變、循環變化、好運來臨、因果循環。事物正在轉向有利方向。",
+                reversed: "壞運氣、抗拒改變、失去控制。可能正經歷低潮但終將過去。"
+            },
+            {
+                id: "major_11",
+                name: "正義 (Justice)",
+                arcana: "major",
+                suite: null,
+                upright: "公平正義、因果報應、真相顯現、平衡和諧。事情會得到公正的結果。",
+                reversed: "不公不義、偏見歧視、逃避責任。可能面臨不公平的對待或判斷。"
+            },
+            {
+                id: "major_12",
+                name: "吊人 (The Hanged Man)",
+                arcana: "major",
+                suite: null,
+                upright: "換個角度、暫停等待、犧牲奉獻、放下執著。透過暫停獲得新洞察。",
+                reversed: "白白犧牲、抗拒改變、停滯不前。可能在無意義的等待中浪費時間。"
+            },
+            {
+                id: "major_13",
+                name: "死神 (Death)",
+                arcana: "major",
+                suite: null,
+                upright: "結束轉變、新生重生、放下過去、必然改變。舊的結束帶來新的開始。",
+                reversed: "抗拒改變、無法放手、停滞腐敗。可能執著於已經失去的事物。"
+            },
+            {
+                id: "major_14",
+                name: "節制 (Temperance)",
+                arcana: "major",
+                suite: null,
+                upright: "平衡調和、耐心冷靜、中庸之道、療癒整合。尋找各方面的平衡點。",
+                reversed: "失衡極端、缺乏耐心、過度放縱。可能在極端之間搖擺不定。"
+            },
+            {
+                id: "major_15",
+                name: "惡魔 (The Devil)",
+                arcana: "major",
+                suite: null,
+                upright: "束縛限制、物質執著、誘惑慾望、陰影面。意識到自己的限制與執著。",
+                reversed: "掙脫束縛、克服誘惑、釋放自由。正在從限制中解放出來。"
+            },
+            {
+                id: "major_16",
+                name: "塔 (The Tower)",
+                arcana: "major",
+                suite: null,
+                upright: "突然變革、崩潰重建、真相揭露、打破幻象。舊有結構的必然崩解。",
+                reversed: "逃避災難、延遲變革、恐懼改變。抗拒必然的轉變可能造成更大痛苦。"
+            },
+            {
+                id: "major_17",
+                name: "星星 (The Star)",
+                arcana: "major",
+                suite: null,
+                upright: "希望重生、療癒平靜、靈感啟發、信念恢復。黑暗後見到光明的希望。",
+                reversed: "失去信心、絕望消極、缺乏方向。可能在失望中難以看見希望。"
+            },
+            {
+                id: "major_18",
+                name: "月亮 (The Moon)",
+                arcana: "major",
+                suite: null,
+                upright: "潛意識、幻象迷惑、不確定性、內在恐懼。事情並非表面所見。",
+                reversed: "真相顯現、克服恐懼、走出迷霧。逐漸釐清困惑並面對真實。"
+            },
+            {
+                id: "major_19",
+                name: "太陽 (The Sun)",
+                arcana: "major",
+                suite: null,
+                upright: "成功喜悅、活力光明、真實自我、單純快樂。一切明朗且充滿正能量。",
+                reversed: "過度樂觀、延遲成功、內在陰霾。可能需要面對隱藏的陰影面。"
+            },
+            {
+                id: "major_20",
+                name: "審判 (Judgement)",
+                arcana: "major",
+                suite: null,
+                upright: "重生覺醒、反思評估、內在呼喚、第二機會。對過去做出評判並向前邁進。",
+                reversed: "自我懷疑、逃避判斷、無法原諒。可能過度批判自己或他人。"
+            },
+            {
+                id: "major_21",
+                name: "世界 (The World)",
+                arcana: "major",
+                suite: null,
+                upright: "完成圓滿、成就達成、世界開展、和諧統一。一個循環的完美結束。",
+                reversed: "未完成、缺乏閉環、延遲成功。可能在最後一步遇到阻礙。"
+            },
+            // 小阿爾克那 - 權杖 (Wands)
+            {
+                id: "wands_ace",
+                name: "權杖王牌 (Ace of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "新機會、創意火花、熱情啟動、靈感降臨。充滿創造力的新開始。",
+                reversed: "缺乏方向、延遲啟動、失去熱情。創意或計畫遇到阻礙。"
+            },
+            {
+                id: "wands_02",
+                name: "權杖二 (Two of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "規劃未來、等待時機、展望遠方、做出選擇。站在決策的十字路口。",
+                reversed: "缺乏規劃、恐懼未知、猶豫不決。可能在安全與冒險間掙扎。"
+            },
+            {
+                id: "wands_03",
+                name: "權杖三 (Three of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "展望未來、計畫實現、擴展視野、前進動力。努力開始看到成果。",
+                reversed: "計畫受阻、缺乏遠見、延遲進展。可能需要重新評估方向。"
+            },
+            {
+                id: "wands_04",
+                name: "權杖四 (Four of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "慶祝喜悅、穩定和諧、里程碑、團聚歡樂。值得慶祝的成就時刻。",
+                reversed: "不穩定、延遲慶祝、家庭緊張。可能在關係中缺乏和諧。"
+            },
+            {
+                id: "wands_05",
+                name: "權杖五 (Five of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "競爭衝突、意見分歧、挑戰考驗、良性競爭。在分歧中尋找突破。",
+                reversed: "避免衝突、內在矛盾、解決爭議。衝突可能正在平息。"
+            },
+            {
+                id: "wands_06",
+                name: "權杖六 (Six of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "勝利成功、公眾認可、自信展現、領導地位。努力獲得肯定與讚賞。",
+                reversed: "缺乏認可、自我懷疑、失敗挫折。可能需要重新建立信心。"
+            },
+            {
+                id: "wands_07",
+                name: "權杖七 (Seven of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "堅守立場、防衛抗爭、堅持信念、挑戰應對。為自己的位置而戰。",
+                reversed: "放棄堅持、壓力過大、缺乏信心。可能在壓力下感到疲憊。"
+            },
+            {
+                id: "wands_08",
+                name: "權杖八 (Eight of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "快速進展、訊息傳遞、行動迅速、突破停滯。事情正在快速發展。",
+                reversed: "延遲阻礙、倉促魯莽、失去動力。可能需要放慢腳步。"
+            },
+            {
+                id: "wands_09",
+                name: "權杖九 (Nine of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "堅持到底、防備警戒、勇氣毅力、最後防線。雖疲憊但仍堅持。",
+                reversed: "放棄抵抗、偏執多疑、疲憊不堪。可能承受過多壓力。"
+            },
+            {
+                id: "wands_10",
+                name: "權杖十 (Ten of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "負擔過重、責任壓力、堅持完成、接近終點。承擔太多但快要完成。",
+                reversed: "放下負擔、委派責任、解除壓力。學習說不並設定界限。"
+            },
+            {
+                id: "wands_page",
+                name: "權杖侍者 (Page of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "好奇探索、熱情訊息、新計畫、自由精神。充滿興奮的新探險。",
+                reversed: "缺乏方向、魯莽衝動、壞消息。可能需要更多準備和計畫。"
+            },
+            {
+                id: "wands_knight",
+                name: "權杖騎士 (Knight of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "冒險行動、熱情衝勁、魅力自信、快速改變。充滿能量地追求目標。",
+                reversed: "魯莽衝動、缺乏計畫、延遲行動。可能過於急躁或停滞不前。"
+            },
+            {
+                id: "wands_queen",
+                name: "權杖王后 (Queen of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "自信魅力、獨立熱情、創意領導、社交活力。充滿生命力的領導者。",
+                reversed: "嫉妒控制、缺乏自信、情緒化。可能在自我表達上遇到困難。"
+            },
+            {
+                id: "wands_king",
+                name: "權杖國王 (King of Wands)",
+                arcana: "minor",
+                suite: "wands",
+                upright: "遠見領導、企業家精神、大膽果斷、鼓舞他人。天生的領袖和創新者。",
+                reversed: "專制霸道、衝動魯莽、缺乏遠見。可能濫用權力或失去方向。"
+            },
+            // 小阿爾克那 - 聖杯 (Cups)
+            {
+                id: "cups_ace",
+                name: "聖杯王牌 (Ace of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "新戀情、情感豐盛、創意靈感、愛的開始。心靈層面的新開始。",
+                reversed: "情感封閉、愛情受阻、創意枯竭。可能在情感表達上遇到困難。"
+            },
+            {
+                id: "cups_02",
+                name: "聖杯二 (Two of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "伴侶關係、相互吸引、和諧連結、平等夥伴。建立深刻的情感連結。",
+                reversed: "關係失衡、溝通不良、分離疏遠。可能在關係中缺乏和諧。"
+            },
+            {
+                id: "cups_03",
+                name: "聖杯三 (Three of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "友誼歡慶、團隊合作、社交活動、共同喜悅。與他人分享快樂時光。",
+                reversed: "過度放縱、三角關係、孤立疏離。可能在社交中感到不適。"
+            },
+            {
+                id: "cups_04",
+                name: "聖杯四 (Four of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "沉思反省、無聊不滿、重新評估、錯失機會。需要重新檢視內在狀態。",
+                reversed: "重拾興趣、抓住機會、走出低潮。開始欣賞當下的美好。"
+            },
+            {
+                id: "cups_05",
+                name: "聖杯五 (Five of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "失望悲傷、專注損失、遺憾懊悔、情感低落。為失去的事物哀悼。",
+                reversed: "接受現實、向前看、從失敗學習。開始從悲傷中走出來。"
+            },
+            {
+                id: "cups_06",
+                name: "聖杯六 (Six of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "回憶懷舊、童年純真、舊友重逢、往事重現。回顧過去的美好時光。",
+                reversed: "活在過去、無法前進、失去純真。可能過度沉溺於回憶。"
+            },
+            {
+                id: "cups_07",
+                name: "聖杯七 (Seven of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "幻想選擇、過多選項、白日夢、誘惑迷惑。需要看清現實做出選擇。",
+                reversed: "明確方向、決心行動、放棄幻想。開始認清什麼才是重要的。"
+            },
+            {
+                id: "cups_08",
+                name: "聖杯八 (Eight of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "離開放棄、尋找更多、精神追尋、走向未知。為了成長而離開舒適圈。",
+                reversed: "恐懼離開、逃避問題、停滞不前。可能不願面對必要的改變。"
+            },
+            {
+                id: "cups_09",
+                name: "聖杯九 (Nine of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "願望達成、滿足快樂、情感豐盛、夢想實現。享受成果的喜悅時刻。",
+                reversed: "過度滿足、自私貪婪、空虛失落。可能在物質中迷失真正的快樂。"
+            },
+            {
+                id: "cups_10",
+                name: "聖杯十 (Ten of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "家庭和諧、完美幸福、情感圓滿、持久關係。達到情感層面的完滿。",
+                reversed: "家庭問題、關係破裂、價值衝突。可能在關係中遇到挑戰。"
+            },
+            {
+                id: "cups_page",
+                name: "聖杯侍者 (Page of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "創意訊息、新戀情、直覺發展、情感探索。帶著好奇探索情感世界。",
+                reversed: "情感不成熟、創意受阻、壞消息。可能在情感表達上顯得幼稚。"
+            },
+            {
+                id: "cups_knight",
+                name: "聖杯騎士 (Knight of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "浪漫追求、藝術靈感、理想主義、情感邀請。充滿魅力的浪漫使者。",
+                reversed: "不切實際、情緒化、欺騙謊言。可能過於理想化或不真誠。"
+            },
+            {
+                id: "cups_queen",
+                name: "聖杯王后 (Queen of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "情感成熟、同理關懷、直覺敏銳、療癒滋養。充滿愛與智慧的存在。",
+                reversed: "情緒不穩、過度敏感、依賴他人。可能在情感界限上有困難。"
+            },
+            {
+                id: "cups_king",
+                name: "聖杯國王 (King of Cups)",
+                arcana: "minor",
+                suite: "cups",
+                upright: "情感平衡、外交手腕、成熟穩重、智慧領導。掌控情感的智慧領袖。",
+                reversed: "情感壓抑、操控他人、冷酷無情。可能過度控制或壓抑情感。"
+            },
+            // 小阿爾克那 - 寶劍 (Swords)
+            {
+                id: "swords_ace",
+                name: "寶劍王牌 (Ace of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "新想法、心智清晰、突破洞察、真理揭示。思想層面的突破性時刻。",
+                reversed: "混亂思緒、錯誤判斷、溝通不良。可能在思考上感到困惑。"
+            },
+            {
+                id: "swords_02",
+                name: "寶劍二 (Two of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "困難選擇、僵持不下、避免衝突、內在矛盾。需要做出艱難的決定。",
+                reversed: "打破僵局、做出決定、資訊揭露。開始面對被迴避的選擇。"
+            },
+            {
+                id: "swords_03",
+                name: "寶劍三 (Three of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "心碎悲傷、情感創傷、痛苦分離、失望沮喪。經歷心靈上的痛苦。",
+                reversed: "療癒恢復、釋放痛苦、寬恕和解。開始從傷痛中復原。"
+            },
+            {
+                id: "swords_04",
+                name: "寶劍四 (Four of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "休息恢復、靜思沉澱、暫時撤退、儲備能量。需要暫停並充電。",
+                reversed: "精疲力竭、無法休息、重新行動。可能需要強迫自己休息。"
+            },
+            {
+                id: "swords_05",
+                name: "寶劍五 (Five of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "衝突敗北、自私勝利、無意義爭鬥、代價慘重。勝利但失去更多。",
+                reversed: "和解原諒、走出衝突、承認錯誤。開始修復破裂的關係。"
+            },
+            {
+                id: "swords_06",
+                name: "寶劍六 (Six of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "過渡轉變、離開困境、向前移動、尋找平靜。走向更好的未來。",
+                reversed: "延遲過渡、抗拒改變、動盪不安。可能在改變中遇到阻礙。"
+            },
+            {
+                id: "swords_07",
+                name: "寶劍七 (Seven of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "策略行動、避免正面、隱秘計畫、不完全誠實。採取策略性的方式。",
+                reversed: "真相揭露、承認錯誤、放棄欺騙。開始面對逃避的問題。"
+            },
+            {
+                id: "swords_08",
+                name: "寶劍八 (Eight of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "自我限制、受困思維、無助感、恐懼束縛。感到被困但其實可以掙脫。",
+                reversed: "釋放自由、新視角、克服恐懼。開始認清並打破限制。"
+            },
+            {
+                id: "swords_09",
+                name: "寶劍九 (Nine of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "焦慮擔憂、失眠惡夢、過度思慮、心理壓力。被恐懼和憂慮所困。",
+                reversed: "希望恢復、面對恐懼、走出陰影。開始處理焦慮和擔憂。"
+            },
+            {
+                id: "swords_10",
+                name: "寶劍十 (Ten of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "痛苦結束、背叛傷害、谷底時刻、徹底失敗。雖然痛苦但最壞已過。",
+                reversed: "復原重生、走出谷底、教訓學習。最黑暗的時刻已經過去。"
+            },
+            {
+                id: "swords_page",
+                name: "寶劍侍者 (Page of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "好奇心、警覺性、新想法、溝通訊息。充滿好奇地探索真相。",
+                reversed: "多嘴八卦、缺乏遠見、粗心大意。可能在溝通上造成誤會。"
+            },
+            {
+                id: "swords_knight",
+                name: "寶劍騎士 (Knight of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "快速行動、直接溝通、野心追求、理性決斷。充滿決心地追求目標。",
+                reversed: "魯莽衝動、缺乏計畫、攻擊性。可能過於激進而忽略細節。"
+            },
+            {
+                id: "swords_queen",
+                name: "寶劍王后 (Queen of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "獨立思考、直接溝通、客觀判斷、界限清晰。智慧且不感情用事。",
+                reversed: "冷酷無情、過度批判、情感封閉。可能過於嚴苛或疏離。"
+            },
+            {
+                id: "swords_king",
+                name: "寶劍國王 (King of Swords)",
+                arcana: "minor",
+                suite: "swords",
+                upright: "理性智慧、公正判斷、權威領導、清晰思維。以理性和真理領導。",
+                reversed: "濫用權力、冷酷無情、操控他人。可能過於嚴厲或不公正。"
+            },
+            // 小阿爾克那 - 錢幣 (Pentacles)
+            {
+                id: "pentacles_ace",
+                name: "錢幣王牌 (Ace of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "新機會、財務開始、物質基礎、實際成果。物質層面的新開始。",
+                reversed: "錯失機會、財務問題、缺乏規劃。可能在物質上遇到挑戰。"
+            },
+            {
+                id: "pentacles_02",
+                name: "錢幣二 (Two of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "平衡多工、靈活應變、時間管理、優先順序。在變化中保持平衡。",
+                reversed: "失去平衡、過度承擔、財務壓力。可能在多項責任中掙扎。"
+            },
+            {
+                id: "pentacles_03",
+                name: "錢幣三 (Three of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "團隊合作、技能展現、學習成長、認可肯定。透過合作創造品質。",
+                reversed: "缺乏合作、技能不足、品質問題。可能在團隊工作中遇到困難。"
+            },
+            {
+                id: "pentacles_04",
+                name: "錢幣四 (Four of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "儲蓄保守、控制擁有、安全感、物質執著。過度保護自己的資源。",
+                reversed: "慷慨分享、放下執著、財務彈性。學習在給予與保留間平衡。"
+            },
+            {
+                id: "pentacles_05",
+                name: "錢幣五 (Five of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "財務困難、孤立無助、缺乏支持、物質匱乏。經歷困難的時期。",
+                reversed: "情況改善、尋求幫助、走出困境。開始從困難中復原。"
+            },
+            {
+                id: "pentacles_06",
+                name: "錢幣六 (Six of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "慷慨給予、分享資源、公平交換、接受幫助。財富的平衡流動。",
+                reversed: "不平等、附加條件、自私小氣。可能在給予或接受上失衡。"
+            },
+            {
+                id: "pentacles_07",
+                name: "錢幣七 (Seven of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "評估進展、耐心等待、長期投資、檢視成果。在等待收穫的時刻。",
+                reversed: "缺乏進展、焦慮不耐、放棄太早。可能對成果感到不滿。"
+            },
+            {
+                id: "pentacles_08",
+                name: "錢幣八 (Eight of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "專注學習、技能精進、努力工作、匠人精神。透過勤奮提升技能。",
+                reversed: "完美主義、缺乏專注、低品質。可能在工作品質上妥協。"
+            },
+            {
+                id: "pentacles_09",
+                name: "錢幣九 (Nine of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "財務獨立、成就享受、優雅品味、自給自足。享受努力換來的成果。",
+                reversed: "過度工作、財務依賴、失去平衡。可能為物質犧牲太多。"
+            },
+            {
+                id: "pentacles_10",
+                name: "錢幣十 (Ten of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "財富傳承、家族和諧、長期保障、物質圓滿。達到物質層面的完滿。",
+                reversed: "家族問題、財務損失、短視近利。可能在財富或家庭上遇到挑戰。"
+            },
+            {
+                id: "pentacles_page",
+                name: "錢幣侍者 (Page of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "學習機會、新計畫、實際目標、好消息。帶著熱情開始新的學習。",
+                reversed: "缺乏進展、拖延懶惰、壞消息。可能在實踐上缺乏行動。"
+            },
+            {
+                id: "pentacles_knight",
+                name: "錢幣騎士 (Knight of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "穩定可靠、努力勤奮、務實保守、負責任。穩步向目標前進。",
+                reversed: "停滯不前、過度謹慎、無聊乏味。可能過於保守而錯失機會。"
+            },
+            {
+                id: "pentacles_queen",
+                name: "錢幣王后 (Queen of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "務實滋養、財務穩定、居家舒適、大地母親。在物質與情感上都富足。",
+                reversed: "物質執著、缺乏平衡、忽視自我。可能過度關注物質而忽略其他。"
+            },
+            {
+                id: "pentacles_king",
+                name: "錢幣國王 (King of Pentacles)",
+                arcana: "minor",
+                suite: "pentacles",
+                upright: "財富成功、商業頭腦、穩定保障、物質掌控。成功的物質領域領導者。",
+                reversed: "貪婪自私、頑固守舊、物質主義。可能過度關注財富而失去價值觀。"
+            }
+        ];
+
+        // ============================================
+        // 牌陣定義
+        // ============================================
+        const SPREAD_CONFIGS = {
+            1: [
+                { index: 1, title: "今日建議" }
+            ],
+            3: [
+                { index: 1, title: "過去" },
+                { index: 2, title: "現在" },
+                { index: 3, title: "未來" }
+            ]
+        };
+
+        // ============================================
+        // 工具函數
+        // ============================================
+        
+        /**
+         * 使用 crypto.getRandomValues 生成安全的隨機數
+         */
+        function getSecureRandomInt(max) {
+            const array = new Uint32Array(1);
+            crypto.getRandomValues(array);
+            return array[0] % max;
+        }
+
+        /**
+         * 洗牌演算法 (Fisher-Yates Shuffle)
+         */
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = getSecureRandomInt(i + 1);
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        /**
+         * 抽牌主函數
+         */
+        function drawCards(spreadCount, allowReversed) {
+            const shuffled = shuffleArray(CARD_DB);
+            const drawn = shuffled.slice(0, spreadCount);
+            const positions = SPREAD_CONFIGS[spreadCount];
+            
+            return drawn.map((card, index) => {
+                const isReversed = allowReversed && (getSecureRandomInt(2) === 1);
+                return {
+                    positionIndex: positions[index].index,
+                    positionTitle: positions[index].title,
+                    cardName: card.name,
+                    orientation: isReversed ? 'reversed' : 'upright',
+                    description: isReversed ? card.reversed : card.upright,
+                    arcana: card.arcana
+                };
+            });
+        }
+
+        /**
+         * 生成整體摘要（規則式）
+         */
+        function generateSummary(draws) {
+            const reversedCount = draws.filter(d => d.orientation === 'reversed').length;
+            const majorCount = draws.filter(d => d.arcana === 'major').length;
+            const totalCount = draws.length;
+            
+            let summary = '';
+            
+            // 根據逆位數量
+            if (reversedCount > 0) {
+                summary += `本次抽牌出現了 ${reversedCount} 張逆位牌。逆位牌提醒您在前進之前，可能需要先進行內在調整、解決潛在問題，或是重新審視當前的方向。`;
+            } else {
+                summary += '本次抽牌全為正位，顯示能量流動順暢，您可以較為直接地朝目標前進。';
+            }
+            
+            summary += ' ';
+            
+            // 根據大牌比例
+            const majorRatio = majorCount / totalCount;
+            if (majorRatio >= 0.67) {
+                summary += '大阿爾克那牌比例較高，暗示此刻涉及重大的人生課題、價值觀選擇，或是命運層面的轉折。建議以更宏觀的視野看待當前狀況。';
+            } else if (majorRatio >= 0.34) {
+                summary += '大小阿爾克那牌平衡出現，顯示您在日常實踐與深層成長之間都有需要關注的面向。';
+            } else {
+                summary += '小阿爾克那牌比例較高，代表目前著重於日常事務的處理、具體行動的選擇，或是人際關係的調整。';
+            }
+            
+            return summary;
+        }
+
+        /**
+         * 顯示結果
+         */
+        function displayResults(draws, summary) {
+            const resultsDiv = document.getElementById('results');
+            const summaryText = document.getElementById('summaryText');
+            const cardsContainer = document.getElementById('cardsContainer');
+            
+            // 顯示整體摘要
+            summaryText.textContent = summary;
+            
+            // 清空並顯示每張牌
+            cardsContainer.innerHTML = '';
+            draws.forEach(draw => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card-result';
+                
+                const orientationClass = draw.orientation === 'upright' ? 'orientation-upright' : 'orientation-reversed';
+                const orientationText = draw.orientation === 'upright' ? '正位' : '逆位';
+                
+                cardDiv.innerHTML = `
+                    <div class="card-position">位置 ${draw.positionIndex}：${draw.positionTitle}</div>
+                    <div class="card-name">${draw.cardName}</div>
+                    <span class="card-orientation ${orientationClass}">${orientationText}</span>
+                    <div class="card-description">${draw.description}</div>
+                `;
+                
+                cardsContainer.appendChild(cardDiv);
+            });
+            
+            // 顯示結果區
+            resultsDiv.classList.add('show');
+            
+            // 平滑滾動到結果區
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /**
+         * 執行抽牌
+         */
+        function performDraw() {
+            const spreadCount = parseInt(document.getElementById('spread').value);
+            const allowReversed = document.getElementById('allowReversed').checked;
+            
+            const draws = drawCards(spreadCount, allowReversed);
+            const summary = generateSummary(draws);
+            
+            displayResults(draws, summary);
+        }
+
+        /**
+         * 重置表單
+         */
+        function resetForm() {
+            document.getElementById('spread').value = '1';
+            document.getElementById('qtype').value = '';
+            document.getElementById('question').value = '';
+            document.getElementById('allowReversed').checked = true;
+            document.getElementById('results').classList.remove('show');
+        }
+
+        // ============================================
+        // 事件監聽器
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnDraw = document.getElementById('btnDraw');
+            const btnRedraw = document.getElementById('btnRedraw');
+            const btnReset = document.getElementById('btnReset');
+            
+            btnDraw.addEventListener('click', performDraw);
+            btnRedraw.addEventListener('click', performDraw);
+            btnReset.addEventListener('click', resetForm);
+        });
+    </script>
+</body>
+</html>
