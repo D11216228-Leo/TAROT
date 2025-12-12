@@ -955,10 +955,16 @@
         
         /**
          * 使用 crypto.getRandomValues 生成安全的隨機數
+         * 使用 rejection sampling 避免 modulo bias
          */
         function getSecureRandomInt(max) {
             const array = new Uint32Array(1);
-            crypto.getRandomValues(array);
+            const limit = Math.floor(0xFFFFFFFF / max) * max;
+            
+            do {
+                crypto.getRandomValues(array);
+            } while (array[0] >= limit);
+            
             return array[0] % max;
         }
 
@@ -1039,7 +1045,7 @@
             summaryText.textContent = summary;
             
             // 清空並顯示每張牌
-            cardsContainer.innerHTML = '';
+            cardsContainer.replaceChildren();
             draws.forEach(draw => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'card-result';
@@ -1047,12 +1053,27 @@
                 const orientationClass = draw.orientation === 'upright' ? 'orientation-upright' : 'orientation-reversed';
                 const orientationText = draw.orientation === 'upright' ? '正位' : '逆位';
                 
-                cardDiv.innerHTML = `
-                    <div class="card-position">位置 ${draw.positionIndex}：${draw.positionTitle}</div>
-                    <div class="card-name">${draw.cardName}</div>
-                    <span class="card-orientation ${orientationClass}">${orientationText}</span>
-                    <div class="card-description">${draw.description}</div>
-                `;
+                // 使用 DOM 操作而非 innerHTML 以避免 XSS 風險
+                const positionDiv = document.createElement('div');
+                positionDiv.className = 'card-position';
+                positionDiv.textContent = `位置 ${draw.positionIndex}：${draw.positionTitle}`;
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'card-name';
+                nameDiv.textContent = draw.cardName;
+                
+                const orientationSpan = document.createElement('span');
+                orientationSpan.className = `card-orientation ${orientationClass}`;
+                orientationSpan.textContent = orientationText;
+                
+                const descriptionDiv = document.createElement('div');
+                descriptionDiv.className = 'card-description';
+                descriptionDiv.textContent = draw.description;
+                
+                cardDiv.appendChild(positionDiv);
+                cardDiv.appendChild(nameDiv);
+                cardDiv.appendChild(orientationSpan);
+                cardDiv.appendChild(descriptionDiv);
                 
                 cardsContainer.appendChild(cardDiv);
             });
